@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { register } from '../store/slice/authSlice';
+import { register, clearError } from '../store/slice/authSlice';
 import type { RootState } from '../store/store';
 import {
     User,
@@ -57,6 +57,12 @@ export const Register = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setPasswordError('');
+        dispatch(clearError());
+
+        if (password.length < 8) {
+            setPasswordError('Password must be at least 8 characters long');
+            return;
+        }
 
         if (password !== confirmPassword) {
             setPasswordError('Passwords do not match');
@@ -185,7 +191,11 @@ export const Register = () => {
                                         : 'bg-slate-50/70 border-slate-300/80 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500/15'
                                 }`}
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(e) => {
+                                    setPassword(e.target.value);
+                                    if (passwordError) setPasswordError('');
+                                    if (error) dispatch(clearError());
+                                }}
                                 required
                                 placeholder="At least 8 characters"
                                 minLength={8}
@@ -233,7 +243,11 @@ export const Register = () => {
                                         : 'bg-slate-50/70 border-slate-300/80 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500/15'
                                 }`}
                                 value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                onChange={(e) => {
+                                    setConfirmPassword(e.target.value);
+                                    if (passwordError) setPasswordError('');
+                                    if (error) dispatch(clearError());
+                                }}
                                 required
                                 placeholder="Re-enter your password"
                                 minLength={8}
