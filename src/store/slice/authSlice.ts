@@ -33,7 +33,7 @@ const initialState: AuthState = {
     error: null,
 };
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.PROD ? 'https://todo-list-backend-4ajm.onrender.com' : 'http://localhost:5000');
 
 
 export const login = createAsyncThunk(
