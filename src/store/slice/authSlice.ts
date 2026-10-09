@@ -46,6 +46,9 @@ export const login = createAsyncThunk(
                 { withCredentials: true }
             );
             const user = response.data.user || response.data;
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+            }
             localStorage.setItem('user', JSON.stringify(user));
             return response.data;
         } catch (error) {
@@ -67,6 +70,9 @@ export const register = createAsyncThunk(
                 { withCredentials: true }
             );
             const user = response.data.user || response.data;
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+            }
             localStorage.setItem('user', JSON.stringify(user));
             return response.data;
         } catch (error) {
@@ -81,10 +87,14 @@ export const register = createAsyncThunk(
 export const logout = createAsyncThunk(
     'auth/logout',
     async () => {
-        await axios.post(`${BACKEND_URL}/api/users/logout`, {}, {
-            withCredentials: true,
-        });
-        localStorage.removeItem('user');
+        try {
+            await axios.post(`${BACKEND_URL}/api/users/logout`, {}, {
+                withCredentials: true,
+            });
+        } finally {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+        }
         return;
     }
 );

@@ -25,13 +25,19 @@ const initialState: TaskState = {
 
 const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || (import.meta.env.PROD ? 'https://todo-list-backend-4ajm.onrender.com' : 'http://localhost:5000');
 
+const getAuthConfig = () => {
+    const token = localStorage.getItem('token');
+    return {
+        withCredentials: true,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+    };
+};
+
 export const fetchTasks = createAsyncThunk(
     'tasks/fetchTasks',
     async (_, { rejectWithValue }) => {
         try {
-            const { data } = await axios.get(`${API_URL}/api/tasks`, {
-                withCredentials: true,
-            });
+            const { data } = await axios.get(`${API_URL}/api/tasks`, getAuthConfig());
             return data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks');
@@ -43,9 +49,7 @@ export const createTask = createAsyncThunk(
     'tasks/createTask',
     async (taskData: Omit<Task, 'id' | '_id'>, { rejectWithValue }) => {
         try {
-            const { data } = await axios.post(`${API_URL}/api/tasks`, taskData, {
-                withCredentials: true,
-            });
+            const { data } = await axios.post(`${API_URL}/api/tasks`, taskData, getAuthConfig());
             return data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to create task');
@@ -58,9 +62,7 @@ export const updateTask = createAsyncThunk(
     async ({ id, task }: { id: string; task: Partial<Task> }, { rejectWithValue }) => {
         try {
             const updatedTask = { ...task, status: task.status as 'pending' | 'completed' };
-            const { data } = await axios.put(`${API_URL}/api/tasks/${id}`, updatedTask, {
-                withCredentials: true,
-            });
+            const { data } = await axios.put(`${API_URL}/api/tasks/${id}`, updatedTask, getAuthConfig());
             return data.task || data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to update task');
@@ -72,9 +74,7 @@ export const deleteTask = createAsyncThunk(
     'tasks/deleteTask',
     async (id: string, { rejectWithValue }) => {
         try {
-            await axios.delete(`${API_URL}/api/tasks/${id}`, {
-                withCredentials: true,
-            });
+            await axios.delete(`${API_URL}/api/tasks/${id}`, getAuthConfig());
             return id;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to delete task');
