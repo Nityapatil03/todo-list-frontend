@@ -48,7 +48,11 @@ export const Dashboard = () => {
         if (!isAuthenticated) {
             navigate('/login');
         } else {
-            dispatch(fetchTasks());
+            dispatch(fetchTasks()).unwrap().catch((err: any) => {
+                if (err && typeof err === 'string' && (err.includes('Not authorized') || err.includes('token'))) {
+                    navigate('/login');
+                }
+            });
         }
     }, [isAuthenticated, navigate, dispatch]);
 

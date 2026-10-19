@@ -40,6 +40,10 @@ export const fetchTasks = createAsyncThunk(
             const { data } = await axios.get(`${API_URL}/api/tasks`, getAuthConfig());
             return data;
         } catch (error: any) {
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks');
         }
     }
